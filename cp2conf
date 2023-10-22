@@ -1,0 +1,32 @@
+CP=cp
+CPFLAGS=-p
+ECHO=echo
+HOSTNAME=hostname
+SED=sed
+TR=tr
+CD=cd
+PWD=pwd
+GIT=git
+
+STARTDIR=`${PWD}`
+CONFDIR=~/`${HOSTNAME} -s`_conf
+DSTFILE=`${ECHO} $1 | ${SED} -e "s#/^$HOME#!HOME#" -e 's#^~#!HOME#' | ${TR} '/' '!'`
+
+if test ! -d ${CONFDIR}; then
+    ${ECHO} "${CONFDIR} is not exist." >&2;
+    exit 1;
+fi
+if test -z $2; then
+    ${ECHO} "Set conf class as arg 2." >&2;
+    exit 1;
+fi
+if test ! -d ${CONFDIR}/$2; then
+    ${ECHO} "$2 in ${CONFDIR} is not exist." >&2;
+    exit 1;
+fi
+${CD} ${CONFDIR}/$2
+${ECHO} "pwd: ${PWD}"
+${CP} ${CPFLAGS} $1 "${DSTFILE}"
+${GIT} add "${DSTFILE}"
+${GIT} commit "${DSTFILE}" -m "現状の$1を追加"
+${CD} ${STARTDIR}
